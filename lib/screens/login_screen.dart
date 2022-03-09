@@ -80,8 +80,8 @@ class _LoginForm extends StatelessWidget {
               keyboardType: TextInputType.emailAddress,
               obscureText: true,
               decoration: InputDecorations.authInputDecoration(
-                hintText: '**********',
-                labelText: 'Contraaseña',
+                hintText: '******',
+                labelText: 'Contraseña',
                 prefixIcon: Icons.lock_outline,
               ),
               onChanged: (value) => loginForm.password = value,
@@ -91,20 +91,32 @@ class _LoginForm extends StatelessWidget {
             ),
             const SizedBox(height: 25),
             MaterialButton(
-              onPressed: () {
-                if (!loginForm.isValidForm()) return;
-                Navigator.pushReplacementNamed(context, 'home');
-              },
+              onPressed: loginForm.isLoading
+                  ? null
+                  : () async {
+                      if (!loginForm.isValidForm()) return;
+                      FocusScope.of(context).unfocus();
+                      loginForm.isLoading = true;
+                      await Future.delayed(const Duration(seconds: 2));
+                      // TODO Validar si el login es correcto
+                      loginForm.isLoading = false;
+                      //  Navigator.pushReplacementNamed(context, 'home');
+                    },
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               disabledColor: Colors.grey,
               elevation: 0,
               color: Colors.deepPurple,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-                child: const Text(
-                  'Ingresar',
-                  style: TextStyle(color: Colors.white),
-                ),
+              child: SizedBox(
+                height: 46,
+                width: 200,
+                child: !loginForm.isLoading
+                    ? const Center(
+                        child: Text(
+                          'Ingresar',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    : const Center(child: CircularProgressIndicator()),
               ),
             )
           ],
