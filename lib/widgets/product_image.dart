@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 
 class ProductImage extends StatelessWidget {
-  const ProductImage({Key? key}) : super(key: key);
-
+  const ProductImage({Key? key, this.url}) : super(key: key);
+  final String? url;
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
       width: double.infinity,
-      height: 200,
+      height: 350,
       decoration: _buildBoxDecoration(),
-      child: const ClipRRect(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-        child: FadeInImage(
-          image: NetworkImage('https://via.placeholder.com/400x300/green'),
-          placeholder: AssetImage('asset/jar-loading.gif'),
-          fit: BoxFit.cover,
-        ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+        child: url == null
+            ? const Image(
+                image: AssetImage('assets/no-image.png'),
+                fit: BoxFit.cover,
+              )
+            : FadeInImage(
+                image: NetworkImage(url!),
+                placeholder: const AssetImage('assets/jar-loading.gif'),
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }

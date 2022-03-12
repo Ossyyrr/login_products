@@ -8,7 +8,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16),
-      height: 250,
+      height: 350,
       width: double.infinity,
       decoration: _cardBorders(),
       child: Stack(

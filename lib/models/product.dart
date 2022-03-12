@@ -10,6 +10,7 @@ class Product {
     required this.name,
     this.picture,
     required this.price,
+    this.id,
   });
 
   String? id;
@@ -34,4 +35,6 @@ class Product {
         "picture": picture,
         "price": price,
       };
+
+  Product copy() => Product(available: available, name: name, price: price, picture: picture, id: id);
 }
