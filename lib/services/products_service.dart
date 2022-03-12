@@ -11,6 +11,7 @@ class ProductsService extends ChangeNotifier {
   late Product selectedProduct;
 
   bool isLoading = true;
+  bool isSaving = false;
 
   ProductsService() {
     loadProducts();
@@ -20,7 +21,6 @@ class ProductsService extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     final url = Uri.https(_baseUrl, 'products.json');
-
     final resp = await http.get(url);
     final Map<String, dynamic> productsMap = jsonDecode(resp.body);
 
@@ -37,5 +37,29 @@ class ProductsService extends ChangeNotifier {
     notifyListeners();
 
     return products;
+  }
+
+  Future saveOrCreateProduct(Product product) async {
+    isSaving = true;
+    notifyListeners();
+
+    if (product.id == null) {
+      // Crear
+    } else {
+      // Actualizar
+      updateProduct(product);
+    }
+
+    isSaving = false;
+    notifyListeners();
+  }
+
+  String updateProduct(Product product) {
+    final url = Uri.https(_baseUrl, 'products/${product.id}.json');
+    http.put(url, body: product.productToJson(product));
+
+    final index = products.indexWhere((element) => element.id == product.id);
+    products[index] = product;
+    return product.id!;
   }
 }

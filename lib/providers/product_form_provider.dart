@@ -16,6 +16,9 @@ class ProductFormProvider extends ChangeNotifier {
   }
 
   bool isValidForm() {
+    log(product.name);
+    log(product.price.toString());
+    log(product.available.toString());
     return formKey.currentState?.validate() ?? false;
   }
 }
