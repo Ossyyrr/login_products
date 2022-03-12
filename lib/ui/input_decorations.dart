@@ -4,7 +4,7 @@ class InputDecorations {
   static InputDecoration authInputDecoration({
     required String hintText,
     required String labelText,
-    required IconData? prefixIcon,
+    IconData? prefixIcon,
   }) {
     return InputDecoration(
       enabledBorder: const UnderlineInputBorder(
