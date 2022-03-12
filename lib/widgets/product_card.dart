@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:productos_app/models/models.dart';
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({Key? key}) : super(key: key);
-
+  const ProductCard({Key? key, required this.product}) : super(key: key);
+  final Product product;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -12,11 +13,11 @@ class ProductCard extends StatelessWidget {
       decoration: _cardBorders(),
       child: Stack(
         alignment: Alignment.bottomLeft,
-        children: const [
-          _BackgroundImage(),
-          _ProductDetails(),
-          Positioned(top: 0, right: 0, child: _PriceTag()),
-          Positioned(top: 0, left: 0, child: _NotAvailable()),
+        children: [
+          _BackgroundImage(url: product.picture),
+          _ProductDetails(product: product),
+          Positioned(top: 0, right: 0, child: _PriceTag(price: product.price.toString())),
+          if (!product.available) const Positioned(top: 0, left: 0, child: _NotAvailable()),
         ],
       ),
     );
@@ -39,7 +40,6 @@ class _NotAvailable extends StatelessWidget {
   const _NotAvailable({
     Key? key,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,7 +57,7 @@ class _NotAvailable extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
-            '\$105sdfaf.99',
+            'No disponible',
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
         ),
@@ -69,8 +69,9 @@ class _NotAvailable extends StatelessWidget {
 class _PriceTag extends StatelessWidget {
   const _PriceTag({
     Key? key,
+    required this.price,
   }) : super(key: key);
-
+  final String price;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -85,13 +86,13 @@ class _PriceTag extends StatelessWidget {
         color: Colors.indigo,
       ),
       //! FITTEDBOX
-      child: const FittedBox(
+      child: FittedBox(
         fit: BoxFit.contain,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
-            '\$105sdfaf.99',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+            '\$' + price,
+            style: const TextStyle(color: Colors.white, fontSize: 20),
           ),
         ),
       ),
@@ -102,7 +103,9 @@ class _PriceTag extends StatelessWidget {
 class _ProductDetails extends StatelessWidget {
   const _ProductDetails({
     Key? key,
+    required this.product,
   }) : super(key: key);
+  final Product product;
 
   @override
   Widget build(BuildContext context) {
@@ -115,16 +118,16 @@ class _ProductDetails extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const <Widget>[
+        children: <Widget>[
           Text(
-            'Disco duro G',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            product.name,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            'Id del disco duro',
-            style: TextStyle(fontSize: 14, color: Colors.white),
+            product.id ?? '',
+            style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
         ],
       ),
@@ -143,19 +146,26 @@ class _ProductDetails extends StatelessWidget {
 class _BackgroundImage extends StatelessWidget {
   const _BackgroundImage({
     Key? key,
+    this.url,
   }) : super(key: key);
-
+  final String? url;
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
-      child: const SizedBox(
+      child: SizedBox(
         width: double.infinity,
         height: 400,
-        child: FadeInImage(
-            placeholder: AssetImage('assets/jar-loading.gif'),
-            image: NetworkImage('https://via.placeholder.com/400x300/ffffff'),
-            fit: BoxFit.cover),
+        child: url == null
+            ? const Image(
+                image: AssetImage('assets/no-image.png'),
+                fit: BoxFit.cover,
+              )
+            : FadeInImage(
+                placeholder: const AssetImage('assets/jar-loading.gif'),
+                image: NetworkImage(url!),
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }

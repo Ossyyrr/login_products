@@ -12,6 +12,7 @@ class Product {
     required this.price,
   });
 
+  String? id;
   bool available;
   String name;
   String? picture;
