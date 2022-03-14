@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:productos_app/providers/product_form_provider.dart';
 import 'package:productos_app/services/services.dart';
 import 'package:productos_app/ui/input_decorations.dart';
@@ -68,8 +71,17 @@ class _ProductScreenBody extends StatelessWidget {
                       color: Colors.indigo,
                     ),
                     child: IconButton(
-                      onPressed: () {
-                        // TODO Galeria
+                      onPressed: () async {
+                        final picker = ImagePicker();
+                        final XFile? pickedFile =
+                            await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+
+                        if (pickedFile == null) {
+                          print('no seleccionó nada');
+                          return;
+                        }
+                        log('tenemos imagen: ' + pickedFile.path);
+                        productService.updateSelectedProductImage(pickedFile.path);
                       },
                       icon: const Icon(Icons.camera_alt_outlined, size: 28, color: Colors.white),
                     ),
@@ -86,11 +98,18 @@ class _ProductScreenBody extends StatelessWidget {
       ),
       //  floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (!productForm.isValidForm()) return;
-          await productService.saveOrCreateProduct(productForm.product);
-        },
-        child: const Icon(Icons.save),
+        onPressed: productService.isSaving
+            ? null
+            : () async {
+                if (!productForm.isValidForm()) return;
+
+                final String? imageUrl = await productService.uploadImage();
+                log(imageUrl.toString());
+                if (imageUrl != null) productForm.product.picture = imageUrl;
+
+                await productService.saveOrCreateProduct(productForm.product);
+              },
+        child: productService.isSaving ? const CircularProgressIndicator(color: Colors.white) : const Icon(Icons.save),
       ),
     );
   }
