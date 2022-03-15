@@ -14,10 +14,9 @@ class AppState extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => ProductsService(),
-          //lazy: false, -> hasta que no se use no se construye. si lo pongo en false se construye según se inicia la app.
-        ),
+        //lazy: false, -> hasta que no se use no se construye. si lo pongo en false se construye según se inicia la app.
+        ChangeNotifierProvider(create: (_) => ProductsService()),
+        ChangeNotifierProvider(create: (_) => AuthService()),
       ],
       child: const MyApp(),
     );
@@ -33,9 +32,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Productos app',
-      initialRoute: 'home',
+      initialRoute: 'login',
       routes: {
         'login': (_) => const LoginScreen(),
+        'register': (_) => const RegisterScreen(),
         'home': (_) => const HomeScreen(),
         'product': (_) => const ProductScreen(),
       },

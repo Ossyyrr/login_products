@@ -1,11 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:productos_app/providers/login_form_provider.dart';
+import 'package:productos_app/services/auth_service.dart';
 import 'package:productos_app/ui/input_decorations.dart';
 import 'package:productos_app/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,7 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'Login',
+                  'Crear cuenta',
                   style: Theme.of(context).textTheme.headline4,
                 ),
                 const SizedBox(height: 30),
@@ -31,7 +34,7 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, 'register'),
+            onPressed: () => Navigator.pushReplacementNamed(context, 'login'),
             //! StadiumBorder - bordes redondeados
             style: ButtonStyle(
                 overlayColor: MaterialStateProperty.all(Colors.indigo.withOpacity(0.1)),
@@ -39,7 +42,7 @@ class LoginScreen extends StatelessWidget {
             child: const Padding(
               padding: EdgeInsets.all(24),
               child: Text(
-                'Crear una nueva cuenta',
+                '¿Ya tienes una cuenta?',
                 style: TextStyle(fontSize: 16, color: Colors.black87),
               ),
             ),
@@ -101,10 +104,17 @@ class _LoginForm extends StatelessWidget {
                       if (!loginForm.isValidForm()) return;
                       FocusScope.of(context).unfocus();
                       loginForm.isLoading = true;
-                      await Future.delayed(const Duration(seconds: 2));
-                      // TODO Validar si el login es correcto
+
+                      // Validar si el login es correcto
+                      final authService = Provider.of<AuthService>(context, listen: false);
+                      final String? errorMessage = await authService.createUser(loginForm.email, loginForm.password);
+                      if (errorMessage == null) {
+                        Navigator.pushReplacementNamed(context, 'home');
+                      } else {
+                        // TODO Mostrar error en pantalla
+                        log(errorMessage.toString());
+                      }
                       loginForm.isLoading = false;
-                      Navigator.pushReplacementNamed(context, 'home');
                     },
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               disabledColor: Colors.grey,
