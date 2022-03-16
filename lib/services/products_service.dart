@@ -3,10 +3,13 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:productos_app/models/models.dart';
 
 class ProductsService extends ChangeNotifier {
+  final storage = const FlutterSecureStorage();
+
   final String _baseUrl = 'flutter-varios-ec8f7-default-rtdb.firebaseio.com';
   final List<Product> products = [];
   late Product selectedProduct;
@@ -23,7 +26,9 @@ class ProductsService extends ChangeNotifier {
   Future<List<Product>> loadProducts() async {
     isLoading = true;
     notifyListeners();
-    final url = Uri.https(_baseUrl, 'products.json');
+    final url = Uri.https(_baseUrl, 'products.json', {
+      'auth': await storage.read(key: 'token'),
+    });
     final resp = await http.get(url);
     final Map<String, dynamic> productsMap = jsonDecode(resp.body);
 
@@ -58,17 +63,22 @@ class ProductsService extends ChangeNotifier {
     notifyListeners();
   }
 
-  String updateProduct(Product product) {
-    final url = Uri.https(_baseUrl, 'products/${product.id}.json');
-    http.put(url, body: product.productToJson(product));
-
+  Future<String> updateProduct(Product product) async {
     final index = products.indexWhere((element) => element.id == product.id);
     products[index] = product;
+
+    final url = Uri.https(_baseUrl, 'products/${product.id}.json', {
+      'auth': await storage.read(key: 'token'),
+    });
+    http.put(url, body: product.productToJson(product));
+
     return product.id!;
   }
 
   Future<String> createProduct(Product product) async {
-    final url = Uri.https(_baseUrl, 'products.json');
+    final url = Uri.https(_baseUrl, 'products.json', {
+      'auth': await storage.read(key: 'token'),
+    });
     final resp = await http.post(url, body: product.productToJson(product));
     final decodeData = resp.body;
     product.id = jsonDecode(decodeData)['name'];

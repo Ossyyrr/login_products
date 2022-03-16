@@ -77,7 +77,7 @@ class _ProductScreenBody extends StatelessWidget {
                             await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
 
                         if (pickedFile == null) {
-                          print('no seleccionó nada');
+                          log('no seleccionó nada');
                           return;
                         }
                         log('tenemos imagen: ' + pickedFile.path);
@@ -96,7 +96,6 @@ class _ProductScreenBody extends StatelessWidget {
           ],
         )),
       ),
-      //  floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: productService.isSaving
             ? null
@@ -108,6 +107,8 @@ class _ProductScreenBody extends StatelessWidget {
                 if (imageUrl != null) productForm.product.picture = imageUrl;
 
                 await productService.saveOrCreateProduct(productForm.product);
+                NotificationService.showSnackbar('Producto guardado');
+                Navigator.pop(context);
               },
         child: productService.isSaving ? const CircularProgressIndicator(color: Colors.white) : const Icon(Icons.save),
       ),
