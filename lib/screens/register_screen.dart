@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:productos_app/providers/login_form_provider.dart';
-import 'package:productos_app/services/auth_service.dart';
+import 'package:productos_app/services/services.dart';
 import 'package:productos_app/ui/input_decorations.dart';
 import 'package:productos_app/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -101,8 +101,8 @@ class _LoginForm extends StatelessWidget {
               onPressed: loginForm.isLoading
                   ? null
                   : () async {
-                      if (!loginForm.isValidForm()) return;
                       FocusScope.of(context).unfocus();
+                      if (!loginForm.isValidForm()) return;
                       loginForm.isLoading = true;
 
                       // Validar si el login es correcto
@@ -111,10 +111,10 @@ class _LoginForm extends StatelessWidget {
                       if (errorMessage == null) {
                         Navigator.pushReplacementNamed(context, 'home');
                       } else {
-                        // TODO Mostrar error en pantalla
+                        NotificationService.showSnackbar('Error al intentar registrarse');
                         log(errorMessage.toString());
+                        loginForm.isLoading = false;
                       }
-                      loginForm.isLoading = false;
                     },
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               disabledColor: Colors.grey,

@@ -32,8 +32,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Productos app',
-      initialRoute: 'login',
+      //! scaffoldMessengerKey, permite mediante una global key controlar un scaffoldMessenger desde cualquier punto de la app
+      scaffoldMessengerKey: NotificationService.messengerKey,
+      initialRoute: 'checking',
       routes: {
+        'checking': (_) => const CheckAuthScreen(),
         'login': (_) => const LoginScreen(),
         'register': (_) => const RegisterScreen(),
         'home': (_) => const HomeScreen(),

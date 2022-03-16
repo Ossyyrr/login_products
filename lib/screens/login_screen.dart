@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:productos_app/providers/login_form_provider.dart';
+import 'package:productos_app/services/services.dart';
 import 'package:productos_app/ui/input_decorations.dart';
 import 'package:productos_app/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -98,13 +101,20 @@ class _LoginForm extends StatelessWidget {
               onPressed: loginForm.isLoading
                   ? null
                   : () async {
-                      if (!loginForm.isValidForm()) return;
                       FocusScope.of(context).unfocus();
+                      if (!loginForm.isValidForm()) return;
                       loginForm.isLoading = true;
-                      await Future.delayed(const Duration(seconds: 2));
-                      // TODO Validar si el login es correcto
-                      loginForm.isLoading = false;
-                      Navigator.pushReplacementNamed(context, 'home');
+
+                      // Validar si el login es correcto
+                      final authService = Provider.of<AuthService>(context, listen: false);
+                      final String? errorMessage = await authService.login(loginForm.email, loginForm.password);
+                      if (errorMessage == null) {
+                        Navigator.pushReplacementNamed(context, 'home');
+                      } else {
+                        NotificationService.showSnackbar('El correo y la contraseña no son válidos');
+                        log(errorMessage.toString());
+                        loginForm.isLoading = false;
+                      }
                     },
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               disabledColor: Colors.grey,
